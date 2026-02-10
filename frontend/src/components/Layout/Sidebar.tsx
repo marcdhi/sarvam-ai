@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Clapperboard,
   LayoutDashboard,
+  Sparkles,
 } from 'lucide-react';
 import type { AppView } from '../../types';
 import { useStore } from '../../store/useStore';
@@ -20,6 +21,7 @@ import { useStore } from '../../store/useStore';
 const navItems: { view: AppView; label: string; icon: React.ElementType }[] = [
   { view: 'projects', label: 'Projects', icon: FolderOpen },
   { view: 'canvas', label: 'Canvas', icon: LayoutDashboard },
+  { view: 'motion', label: 'Motion', icon: Sparkles },
   { view: 'script', label: 'Script', icon: FileText },
   { view: 'storyboard', label: 'Storyboard', icon: Image },
   { view: 'video', label: 'Video', icon: Video },

@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
-from backend.app.api import audio, export, projects, scripts, settings as settings_api, storyboard, video
+from backend.app.api import audio, export, motion, projects, scripts, settings as settings_api, storyboard, video
 from backend.app.config import ensure_directories, settings
 
 # Configure logging
@@ -50,6 +50,7 @@ app.include_router(video.router)
 app.include_router(audio.router)
 app.include_router(export.router)
 app.include_router(settings_api.router)
+app.include_router(motion.router)
 
 # Serve project files (storyboards, videos, etc.) statically
 projects_dir = Path(settings.projects_dir)

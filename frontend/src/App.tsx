@@ -12,6 +12,7 @@ import { AudioMixer } from './components/AudioMixer/AudioMixer';
 import { TimelineView } from './components/Timeline/TimelineView';
 import { ExportView } from './components/Preview/ExportView';
 import { SettingsView } from './components/Settings/SettingsView';
+import { MotionEditor } from './components/Motion/MotionEditor';
 import { healthApi } from './services/api';
 import { Loader2, WifiOff } from 'lucide-react';
 
@@ -54,6 +55,8 @@ function App() {
         return <TimelineView />;
       case 'export':
         return <ExportView />;
+      case 'motion':
+        return <MotionEditor />;
       case 'settings':
         return <SettingsView />;
       default:
