@@ -13,6 +13,7 @@ router = APIRouter(prefix="/api/settings", tags=["settings"])
 class APIKeysRequest(BaseModel):
     anthropic_api_key: str | None = None
     openai_api_key: str | None = None
+    google_api_key: str | None = None
     replicate_api_token: str | None = None
     elevenlabs_api_key: str | None = None
     runway_api_key: str | None = None
@@ -55,6 +56,7 @@ async def get_settings():
         "api_keys_configured": {
             "anthropic": bool(settings.anthropic_api_key),
             "openai": bool(settings.openai_api_key),
+            "google": bool(settings.google_api_key),
             "replicate": bool(settings.replicate_api_token),
             "elevenlabs": bool(settings.elevenlabs_api_key),
             "runway": bool(settings.runway_api_key),
@@ -70,6 +72,8 @@ async def update_api_keys(req: APIKeysRequest):
         settings.anthropic_api_key = req.anthropic_api_key
     if req.openai_api_key is not None:
         settings.openai_api_key = req.openai_api_key
+    if req.google_api_key is not None:
+        settings.google_api_key = req.google_api_key
     if req.replicate_api_token is not None:
         settings.replicate_api_token = req.replicate_api_token
     if req.elevenlabs_api_key is not None:
@@ -81,6 +85,7 @@ async def update_api_keys(req: APIKeysRequest):
     return {"status": "updated", "api_keys_configured": {
         "anthropic": bool(settings.anthropic_api_key),
         "openai": bool(settings.openai_api_key),
+        "google": bool(settings.google_api_key),
         "replicate": bool(settings.replicate_api_token),
         "elevenlabs": bool(settings.elevenlabs_api_key),
         "runway": bool(settings.runway_api_key),

@@ -28,10 +28,11 @@ export function SettingsView() {
   const [elevenlabsKey, setElevenlabsKey] = useState('');
   const [runwayKey, setRunwayKey] = useState('');
   const [stabilityKey, setStabilityKey] = useState('');
+  const [googleKey, setGoogleKey] = useState('');
 
   // Model preferences
   const [scriptModel, setScriptModel] = useState('claude-sonnet-4-20250514');
-  const [imageProvider, setImageProvider] = useState('openai');
+  const [imageProvider, setImageProvider] = useState('gemini');
   const [videoProvider, setVideoProvider] = useState('runway');
   const [voiceProvider, setVoiceProvider] = useState('elevenlabs');
 
@@ -45,7 +46,7 @@ export function SettingsView() {
       setApiKeysConfigured(res.api_keys_configured);
       setCurrentSettings(res.settings);
       setScriptModel(res.settings.script_model || 'claude-sonnet-4-20250514');
-      setImageProvider(res.settings.image_provider || 'openai');
+      setImageProvider(res.settings.image_provider || 'gemini');
       setVideoProvider(res.settings.video_provider || 'runway');
       setVoiceProvider(res.settings.voice_provider || 'elevenlabs');
     } catch (e: any) {
@@ -65,6 +66,7 @@ export function SettingsView() {
       if (elevenlabsKey) keys.elevenlabs_api_key = elevenlabsKey;
       if (runwayKey) keys.runway_api_key = runwayKey;
       if (stabilityKey) keys.stability_api_key = stabilityKey;
+      if (googleKey) keys.google_api_key = googleKey;
 
       if (Object.keys(keys).length > 0) {
         await settingsApi.updateApiKeys(keys);
@@ -86,6 +88,7 @@ export function SettingsView() {
       setElevenlabsKey('');
       setRunwayKey('');
       setStabilityKey('');
+      setGoogleKey('');
     } catch (e: any) {
       addNotification('error', e.message);
     } finally {
@@ -211,6 +214,20 @@ export function SettingsView() {
               onChange={(e) => setStabilityKey(e.target.value)}
             />
           </div>
+
+          <div>
+            <label className="label flex items-center gap-2">
+              <KeyStatus configured={apiKeysConfigured.google} />
+              Google API Key (Nano Banana / Gemini Images)
+            </label>
+            <input
+              type="password"
+              className="input-field"
+              placeholder={apiKeysConfigured.google ? '********' : 'Enter key...'}
+              value={googleKey}
+              onChange={(e) => setGoogleKey(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
@@ -242,6 +259,7 @@ export function SettingsView() {
               value={imageProvider}
               onChange={(e) => setImageProvider(e.target.value)}
             >
+              <option value="gemini">Nano Banana (Gemini)</option>
               <option value="openai">OpenAI (DALL-E 3)</option>
               <option value="replicate">Replicate (Flux Pro)</option>
             </select>
@@ -296,7 +314,7 @@ export function SettingsView() {
             generation
           </li>
           <li>
-            <strong>OpenAI or Replicate</strong> - Required for storyboard
+            <strong>Google (Nano Banana), OpenAI, or Replicate</strong> - Required for storyboard
             images
           </li>
           <li>

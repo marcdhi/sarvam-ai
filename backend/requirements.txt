@@ -10,6 +10,7 @@ anthropic==0.44.0
 openai==1.59.7
 httpx==0.28.1
 replicate==1.0.4
+google-genai>=1.62.0
 
 # Media Processing
 Pillow>=9.2.0,<11.0

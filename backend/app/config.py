@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     # AI Provider API Keys
     anthropic_api_key: Optional[str] = None
     openai_api_key: Optional[str] = None
+    google_api_key: Optional[str] = None
     replicate_api_token: Optional[str] = None
     elevenlabs_api_key: Optional[str] = None
     runway_api_key: Optional[str] = None
@@ -28,8 +29,8 @@ class Settings(BaseSettings):
 
     # Default AI Model Preferences
     script_model: str = "claude-sonnet-4-20250514"
-    image_provider: str = "openai"  # openai, replicate
-    image_model: str = "dall-e-3"
+    image_provider: str = "gemini"  # gemini (Nano Banana), openai, replicate
+    image_model: str = "gemini-2.5-flash-preview-image-generation"
     video_provider: str = "runway"  # runway, replicate
     video_model: str = "gen4_turbo"
     voice_provider: str = "elevenlabs"  # elevenlabs, openai

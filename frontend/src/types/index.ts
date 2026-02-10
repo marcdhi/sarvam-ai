@@ -124,6 +124,7 @@ export type PipelineStage =
 
 export type AppView =
   | 'projects'
+  | 'canvas'
   | 'script'
   | 'storyboard'
   | 'video'

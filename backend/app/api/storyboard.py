@@ -28,6 +28,11 @@ class ConceptArtRequest(BaseModel):
     prompt: str
 
 
+class EditImageRequest(BaseModel):
+    image_path: str
+    instruction: str
+
+
 @router.post("/generate")
 async def generate_storyboards(
     project_id: str,
@@ -110,4 +115,35 @@ async def generate_concept_art(project_id: str, req: ConceptArtRequest):
     output_path = str(output_dir / filename)
 
     await storyboard_service.generate_single_frame(req.prompt, output_path)
+    return {"path": output_path}
+
+
+@router.post("/edit-image")
+async def edit_image(project_id: str, req: EditImageRequest):
+    """Edit an existing image using Nano Banana (Gemini) conversational editing.
+
+    Send an image path and a natural language instruction to modify it.
+    Examples: "Remove the background", "Make it nighttime", "Add rain".
+    """
+    project = await load_project_metadata(project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    if settings.image_provider != "gemini":
+        raise HTTPException(
+            status_code=400,
+            detail="Image editing requires Gemini (Nano Banana) as the image provider"
+        )
+
+    from backend.app.utils.file_manager import get_project_dir
+    import uuid
+
+    output_dir = get_project_dir(project_id) / "assets" / "edited"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    filename = f"edited_{uuid.uuid4().hex[:8]}.png"
+    output_path = str(output_dir / filename)
+
+    await storyboard_service.edit_image_gemini(
+        req.image_path, req.instruction, output_path
+    )
     return {"path": output_path}

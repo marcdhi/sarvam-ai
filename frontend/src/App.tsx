@@ -4,6 +4,7 @@ import { Sidebar } from './components/Layout/Sidebar';
 import { Header } from './components/Layout/Header';
 import { Notifications } from './components/Common/Notifications';
 import { ProjectManager } from './components/ProjectManager/ProjectManager';
+import { InfiniteCanvas } from './components/Canvas/InfiniteCanvas';
 import { ScriptEditor } from './components/ScriptEditor/ScriptEditor';
 import { StoryboardView } from './components/Storyboard/StoryboardView';
 import { VideoView } from './components/Video/VideoView';
@@ -39,6 +40,8 @@ function App() {
     switch (currentView) {
       case 'projects':
         return <ProjectManager />;
+      case 'canvas':
+        return <InfiniteCanvas />;
       case 'script':
         return <ScriptEditor />;
       case 'storyboard':

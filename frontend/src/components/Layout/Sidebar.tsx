@@ -12,12 +12,14 @@ import {
   ChevronLeft,
   ChevronRight,
   Clapperboard,
+  LayoutDashboard,
 } from 'lucide-react';
 import type { AppView } from '../../types';
 import { useStore } from '../../store/useStore';
 
 const navItems: { view: AppView; label: string; icon: React.ElementType }[] = [
   { view: 'projects', label: 'Projects', icon: FolderOpen },
+  { view: 'canvas', label: 'Canvas', icon: LayoutDashboard },
   { view: 'script', label: 'Script', icon: FileText },
   { view: 'storyboard', label: 'Storyboard', icon: Image },
   { view: 'video', label: 'Video', icon: Video },

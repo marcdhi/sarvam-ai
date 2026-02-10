@@ -1,9 +1,13 @@
-"""Storyboard and concept art generation service."""
+"""Storyboard and concept art generation service.
+
+Supports Nano Banana (Gemini Image Generation) as the primary provider,
+with OpenAI DALL-E and Replicate Flux Pro as alternatives.
+"""
 
 from __future__ import annotations
 
+import asyncio
 import base64
-import uuid
 from pathlib import Path
 from typing import Optional
 
@@ -22,6 +26,7 @@ class StoryboardService:
     def __init__(self) -> None:
         self._openai_client: Optional[openai.AsyncOpenAI] = None
         self._http_client: Optional[httpx.AsyncClient] = None
+        self._gemini_client = None
 
     @property
     def openai_client(self) -> openai.AsyncOpenAI:
@@ -36,6 +41,13 @@ class StoryboardService:
         if self._http_client is None:
             self._http_client = httpx.AsyncClient(timeout=120.0)
         return self._http_client
+
+    @property
+    def gemini_client(self):
+        if self._gemini_client is None:
+            from google import genai
+            self._gemini_client = genai.Client(api_key=settings.google_api_key)
+        return self._gemini_client
 
     def _build_image_prompt(
         self,
@@ -100,7 +112,9 @@ class StoryboardService:
         for i in range(num_frames):
             prompt = self._build_image_prompt(scene, i, num_frames, style_notes)
 
-            if provider == "openai":
+            if provider == "gemini":
+                image_data = await self._generate_gemini(prompt)
+            elif provider == "openai":
                 image_data = await self._generate_openai(prompt)
             elif provider == "replicate":
                 image_data = await self._generate_replicate(prompt)
@@ -122,12 +136,91 @@ class StoryboardService:
 
         return frame_paths
 
+    async def _generate_gemini(self, prompt: str) -> bytes:
+        """Generate image using Nano Banana (Google Gemini Image Generation)."""
+        api_key = settings.google_api_key
+        if not api_key:
+            raise ValueError("FILMSTUDIO_GOOGLE_API_KEY not set")
+
+        from google import genai
+        from google.genai import types
+
+        logger.info(f"Generating image via Nano Banana ({settings.image_model})")
+
+        # Run synchronous Gemini client in thread pool
+        def _call_gemini():
+            response = self.gemini_client.models.generate_content(
+                model=settings.image_model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_modalities=["IMAGE"],
+                ),
+            )
+            # Extract image data from response
+            for part in response.candidates[0].content.parts:
+                if part.inline_data:
+                    return base64.b64decode(part.inline_data.data)
+            raise RuntimeError("Gemini returned no image data")
+
+        return await asyncio.to_thread(_call_gemini)
+
+    async def edit_image_gemini(
+        self,
+        image_path: str,
+        edit_instruction: str,
+        output_path: Optional[str] = None,
+    ) -> bytes:
+        """Edit an existing image using Nano Banana's conversational editing.
+
+        This is a unique Gemini capability - send an image + text instruction
+        to modify the image (remove objects, change backgrounds, style transfer, etc.)
+        """
+        api_key = settings.google_api_key
+        if not api_key:
+            raise ValueError("FILMSTUDIO_GOOGLE_API_KEY not set")
+
+        from google import genai
+        from google.genai import types
+
+        image_data = Path(image_path).read_bytes()
+        b64_image = base64.b64encode(image_data).decode()
+        mime_type = "image/png" if image_path.endswith(".png") else "image/jpeg"
+
+        def _call_edit():
+            response = self.gemini_client.models.generate_content(
+                model=settings.image_model,
+                contents=[
+                    types.Part(
+                        inline_data=types.Blob(
+                            mime_type=mime_type,
+                            data=b64_image,
+                        )
+                    ),
+                    edit_instruction,
+                ],
+                config=types.GenerateContentConfig(
+                    response_modalities=["IMAGE"],
+                ),
+            )
+            for part in response.candidates[0].content.parts:
+                if part.inline_data:
+                    return base64.b64decode(part.inline_data.data)
+            raise RuntimeError("Gemini edit returned no image data")
+
+        result = await asyncio.to_thread(_call_edit)
+
+        if output_path:
+            Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+            Path(output_path).write_bytes(result)
+
+        return result
+
     async def _generate_openai(self, prompt: str) -> bytes:
         """Generate image using OpenAI DALL-E."""
         response = await self.openai_client.images.generate(
-            model=settings.image_model,
+            model="dall-e-3",
             prompt=prompt,
-            size="1792x1024",  # Closest to 16:9 available
+            size="1792x1024",
             quality="hd",
             n=1,
             response_format="b64_json",
@@ -141,7 +234,6 @@ class StoryboardService:
         if not api_token:
             raise ValueError("FILMSTUDIO_REPLICATE_API_TOKEN not set")
 
-        # Use Flux Pro for high quality
         model = "black-forest-labs/flux-1.1-pro"
 
         response = await self.http_client.post(
@@ -164,7 +256,6 @@ class StoryboardService:
         response.raise_for_status()
         prediction = response.json()
 
-        # Poll for completion
         prediction_url = prediction["urls"]["get"]
         while True:
             poll = await self.http_client.get(
@@ -184,7 +275,6 @@ class StoryboardService:
             elif result["status"] == "failed":
                 raise RuntimeError(f"Image generation failed: {result.get('error')}")
 
-            import asyncio
             await asyncio.sleep(2)
 
     async def generate_single_frame(
@@ -194,7 +284,9 @@ class StoryboardService:
     ) -> bytes:
         """Generate a single image from a prompt. Useful for concept art."""
         provider = settings.image_provider
-        if provider == "openai":
+        if provider == "gemini":
+            data = await self._generate_gemini(prompt)
+        elif provider == "openai":
             data = await self._generate_openai(prompt)
         elif provider == "replicate":
             data = await self._generate_replicate(prompt)
