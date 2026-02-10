@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+venv/
+.venv/
+env/
+
+# Node
+node_modules/
+frontend/dist/
+electron/dist/
+dist-electron/
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite3
+
+# Project files (user generated)
+projects/
+
+# Logs
+*.log
+filmstudio.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.dmg
+*.AppImage
+*.deb
+*.exe
+*.msi

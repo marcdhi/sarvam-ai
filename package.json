@@ -1,0 +1,59 @@
+{
+  "name": "ai-filmmaking-studio",
+  "version": "1.0.0",
+  "description": "AI-powered end-to-end filmmaking studio desktop application",
+  "main": "electron/dist/main.js",
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && python3 -m backend.app.main",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "build:electron": "cd electron && npx tsc",
+    "build": "npm run build:frontend && npm run build:electron",
+    "start:backend": "cd backend && python3 -m backend.app.main",
+    "start:electron": "electron .",
+    "start": "npm run start:backend & npm run start:electron",
+    "package": "npm run build && electron-builder",
+    "setup": "cd frontend && npm install && cd ../backend && pip3 install -r requirements.txt"
+  },
+  "build": {
+    "appId": "com.aifilmstudio.app",
+    "productName": "AI Filmmaking Studio",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "electron/dist/**/*",
+      "frontend/dist/**/*",
+      "backend/**/*",
+      "!backend/__pycache__/**",
+      "!backend/**/*.pyc"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend",
+        "filter": ["**/*", "!__pycache__/**", "!*.pyc"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.video",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "AudioVideo"
+    }
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.3"
+  },
+  "author": "AI Filmmaking Studio",
+  "license": "MIT"
+}
