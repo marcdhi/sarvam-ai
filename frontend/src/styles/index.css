@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-studio-border;
+  }
+
+  body {
+    @apply bg-studio-bg text-studio-text font-sans antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-studio-bg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-studio-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-studio-text-dim;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-studio-accent text-white rounded-lg font-medium
+      hover:bg-studio-accent-hover transition-colors duration-200
+      disabled:opacity-50 disabled:cursor-not-allowed
+      focus:outline-none focus:ring-2 focus:ring-studio-accent focus:ring-offset-2 focus:ring-offset-studio-bg;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-studio-card text-studio-text rounded-lg font-medium border border-studio-border
+      hover:bg-studio-border transition-colors duration-200
+      disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-studio-danger/20 text-studio-danger rounded-lg font-medium border border-studio-danger/30
+      hover:bg-studio-danger/30 transition-colors duration-200;
+  }
+
+  .btn-ghost {
+    @apply px-3 py-1.5 text-studio-text-muted rounded-lg
+      hover:bg-studio-card hover:text-studio-text transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-studio-surface border border-studio-border rounded-lg
+      text-studio-text placeholder:text-studio-text-dim
+      focus:outline-none focus:border-studio-accent focus:ring-1 focus:ring-studio-accent
+      transition-colors duration-200;
+  }
+
+  .textarea-field {
+    @apply w-full px-3 py-2 bg-studio-surface border border-studio-border rounded-lg
+      text-studio-text placeholder:text-studio-text-dim resize-y min-h-[80px]
+      focus:outline-none focus:border-studio-accent focus:ring-1 focus:ring-studio-accent
+      transition-colors duration-200 font-mono text-sm;
+  }
+
+  .card {
+    @apply bg-studio-card border border-studio-border rounded-xl p-4;
+  }
+
+  .card-hover {
+    @apply card hover:border-studio-accent/50 transition-colors duration-200 cursor-pointer;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-studio-success/20 text-studio-success;
+  }
+
+  .badge-warning {
+    @apply badge bg-studio-warning/20 text-studio-warning;
+  }
+
+  .badge-danger {
+    @apply badge bg-studio-danger/20 text-studio-danger;
+  }
+
+  .badge-info {
+    @apply badge bg-studio-accent/20 text-studio-accent;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-studio-text mb-4;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-studio-text-muted mb-1;
+  }
+
+  .shimmer {
+    @apply bg-gradient-to-r from-studio-card via-studio-border to-studio-card
+      bg-[length:200%_100%] animate-shimmer;
+  }
+}
